@@ -74,7 +74,7 @@ parser.add_argument('--batch_size', type=int, default=512)
 parser.add_argument('--learning_rate', type=int, default=5e-4)
 parser.add_argument('--grad_clipping', type=int, default=100)
 parser.add_argument('--max_epochs', type=int, default=100)
-parser.add_argument('--gpus', type=int, default=1)
+parser.add_argument('--gpus', type=int, default=0)
 parser.add_argument('--precision', type=int, default=32)
 parser.add_argument('--num_workers', type=int, default=8)
 parser.add_argument('--encoder_dim', type=int, default=512)
@@ -171,7 +171,7 @@ def featurize_spectrum(item):
     g.eigvecs = torch.cat([g.eigvecs,eig_pad],0)
 
     instrument = [0] * len(instruments)
-    instrument[instruments.index(item.Instrument)] = 1
+    instrument[instruments.index(item['Instrument'])] = 1
 
     precursor_type = [0] * len(precursor_types)
     precursor_type[precursor_types.index(item.Precursor_type)] = 1
