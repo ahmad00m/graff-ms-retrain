@@ -12,7 +12,7 @@ We do not include NIST-20 or files derived from it (apart from our train-test sp
 
 Once `hr_msms_nist.MSP` has been generated, and placed in `./data/nist-20/`, it must be parsed into a dataframe:
 
-`python preprocess-nist.py data/nist-20/hr_msms_nist.MSP data/nist-20/inchikeys.pkl`
+`python preprocess-nist.py data/nist-20/hr_msms_nist.MSP data/nist-20/inchikeys.pkl --exclude data/nist-20/test_set/exclude_inchikey2d.json`
 
 To then train GrAFF-MS:
 
