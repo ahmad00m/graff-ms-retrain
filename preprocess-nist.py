@@ -4,7 +4,6 @@ import pandas as pd
 from tqdm import tqdm
 import re
 import os
-import json
 
 from rdkit import Chem, RDLogger
 RDLogger.DisableLog('rdApp.*')
@@ -16,7 +15,7 @@ from src.graff import atom_types
 
 ################################################################
 # Helper functions for parsing annotations
-################################################################
+# ###############################################################
 
 def composition_to_string(x):
     return ''.join([a+str(x[a]) for a in sorted(x)])
@@ -140,7 +139,6 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('nist_path')
     parser.add_argument('inchi_path')
-    parser.add_argument('--exclude', type=str, help='Path to JSON file with InChIKey2D exclusion list')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--train_frac', type=float, default=0.8)
     parser.add_argument('--test_frac', type=float, default=0.1)
@@ -149,15 +147,6 @@ if __name__ == '__main__':
     from pandarallel import pandarallel
     from multiprocessing import cpu_count
     pandarallel.initialize(progress_bar=False, verbose=0, nb_workers=cpu_count()//2)
-    
-    # Load exclusion list if provided
-    exclude_inchikey2d = set()
-    if args.exclude and os.path.exists(args.exclude):
-        print(f'Loading exclusion list from {args.exclude}... ', end='')
-        with open(args.exclude, 'r') as f:
-            exclude_data = json.load(f)
-            exclude_inchikey2d = set(exclude_data.get('exclude_inchikey2d', []))
-        print(f'done ({len(exclude_inchikey2d)} InChIKey2D to exclude)')
     
     def extract_instrument(synon_list):
         if isinstance(synon_list, list):
@@ -222,7 +211,7 @@ if __name__ == '__main__':
     df['eV'] = df['eV'].fillna(df['NCE']*df['PrecursorMZ']/500)
     df['NCE'] = df['NCE'].fillna(df['eV']*500/df['PrecursorMZ'])
     
-    # unique identifier
+    # uniqu identifier
     df['Spectrum'] = df['NISTNO']
 
     ################################################################
@@ -273,17 +262,6 @@ if __name__ == '__main__':
     df['InChIKey2D'] = df['InChIKey'].str.split('-').str[0]
     df['has_isotopes'] = df['isotopes'].map(any)
     df['intensities'] = df['intensities'] / df['intensities'].map(sum)
-    
-    ################################################################
-    # Apply exclusion filter BEFORE splitting
-    ################################################################
-    
-    if exclude_inchikey2d:
-        print(f'Applying exclusion filter... ', end='')
-        initial_count = len(df)
-        df = df[~df['InChIKey2D'].isin(exclude_inchikey2d)]
-        excluded_count = initial_count - len(df)
-        print(f'done (excluded {excluded_count} spectra)')
     
     ################################################################
     # structure-disjoint uniform splitting
