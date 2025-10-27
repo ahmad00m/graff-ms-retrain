@@ -12,11 +12,11 @@ We do not include NIST-20 or files derived from it (apart from our train-test sp
 
 Once `hr_msms_nist.MSP` has been generated, and placed in `./data/nist-20/`, it must be parsed into a dataframe:
 
-`python preprocess-nist.py data/nist-20/hr_msms_nist.MSP data/nist-20/inchikeys.pkl --exclude data/nist-20/test_set/exclude_inchikey2d.json`
+`python preprocess-nist.py ../regioisomer_prediction/data/train/nist_train_disjoint.MSP data/nist-20/inchikeys.pkl`
 
 To then train GrAFF-MS:
 
-`python train-graff-ms.py data/nist-20/hr_msms_nist.pkl`
+`python train-graff-ms.py ../regioisomer_prediction/data/train/nist_train_disjoint.pkl`
 
 And to train the NEIMS baseline:
 
